@@ -22,7 +22,7 @@ object ArtApi {
         }
     }
 
-    suspend fun getArtworks(page: Int = 1, limit: Int = 40): ArtworksResponse =
+    suspend fun getArtworks(page: Int = 1, limit: Int = 20): ArtworksResponse =
         client.get("$BASE/artworks") {
             parameter("page", page)
             parameter("limit", limit)
@@ -32,6 +32,14 @@ object ArtApi {
     suspend fun searchArtworks(query: String, page: Int = 1, limit: Int = 40): ArtworksResponse =
         client.get("$BASE/artworks/search") {
             parameter("q", query)
+            parameter("page", page)
+            parameter("limit", limit)
+            parameter("fields", LIST_FIELDS)
+        }.body()
+
+    suspend fun getArtworksByArtist(artistId: Int, page: Int = 1, limit: Int = 40): ArtworksResponse =
+        client.get("$BASE/artworks/search") {
+            parameter("query[term][artist_id]", artistId)
             parameter("page", page)
             parameter("limit", limit)
             parameter("fields", LIST_FIELDS)

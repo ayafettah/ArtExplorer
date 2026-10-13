@@ -1,7 +1,9 @@
 package com.example.artexplorer.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -17,14 +19,27 @@ import com.example.artexplorer.data.Artist
 import com.example.artexplorer.data.stripHtml
 import com.example.artexplorer.ui.theme.Gold
 
+private val suggestions =
+    listOf("Monet", "Van Gogh", "Picasso", "Renoir", "Degas", "Cézanne", "Hopper", "Warhol")
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArtistsScreen(vm: ArtistsViewModel = viewModel()) {
+fun ArtistsScreen(
+    vm: ArtistsViewModel = viewModel(),
+    onArtistClick: (Int, String) -> Unit
+) {
     val query by vm.query.collectAsState()
     val state by vm.state.collectAsState()
 
     Column(Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
         ScreenTitle("Artistes")
         SearchField(query, vm::onQueryChange, "Rechercher un artiste (van gogh...)")
+        Spacer(Modifier.height(8.dp))
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(suggestions) { name ->
+                AssistChip(onClick = { vm.onQueryChange(name) }, label = { Text(name) })
+            }
+        }
         Spacer(Modifier.height(8.dp))
 
         when (val s = state) {
@@ -36,16 +51,18 @@ fun ArtistsScreen(vm: ArtistsViewModel = viewModel()) {
                     contentPadding = PaddingValues(vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(s.data, key = { it.id }) { ArtistCard(it) }
+                    items(s.data, key = { it.id }) { artist ->
+                        ArtistCard(artist) { onArtistClick(artist.id, artist.title ?: "Artiste") }
+                    }
                 }
         }
     }
 }
 
 @Composable
-fun ArtistCard(artist: Artist) {
+fun ArtistCard(artist: Artist, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
@@ -59,9 +76,13 @@ fun ArtistCard(artist: Artist) {
             if (dates.isNotBlank()) Text(dates, color = Gold)
             artist.description?.stripHtml()?.takeIf { it.isNotBlank() }?.let {
                 Spacer(Modifier.height(8.dp))
-                Text(it, maxLines = 4, overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodySmall)
+                Text(
+                    it, maxLines = 4, overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
+            Spacer(Modifier.height(8.dp))
+            Text("Voir les œuvres ›", color = Gold, style = MaterialTheme.typography.labelLarge)
         }
     }
 }

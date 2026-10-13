@@ -31,7 +31,7 @@ fun ArtApp() {
 
     Scaffold(
         bottomBar = {
-            if (current != Screen.Detail.route) {
+            if (current != Screen.Detail.route  && current != Screen.ArtistWorks.route) {
                 NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                     tabs.forEach { (route, label, icon) ->
                         NavigationBarItem(
@@ -59,15 +59,22 @@ fun ArtApp() {
             composable(Screen.Gallery.route) {
                 GalleryScreen(onArtworkClick = { nav.navigate(Screen.Detail.create(it)) })
             }
-            composable(
-                route = Screen.Detail.route,
-                arguments = listOf(navArgument("id") { type = NavType.IntType })
-            ) {
-                DetailScreen(onBack = { nav.popBackStack() })
+            composable(Screen.Artists.route) {
+                ArtistsScreen(onArtistClick = { id, name ->
+                    nav.navigate(Screen.ArtistWorks.create(id, name))
+                })
             }
-            composable(Screen.Artists.route) { ArtistsScreen() }
-            composable(Screen.Surprise.route) {
-                SurpriseScreen(onArtworkClick = { nav.navigate(Screen.Detail.create(it)) })
+            composable(
+                route = Screen.ArtistWorks.route,
+                arguments = listOf(
+                    navArgument("id") { type = NavType.IntType },
+                    navArgument("name") { type = NavType.StringType }
+                )
+            ) {
+                ArtistWorksScreen(
+                    onBack = { nav.popBackStack() },
+                    onArtworkClick = { nav.navigate(Screen.Detail.create(it)) }
+                )
             }
         }
     }

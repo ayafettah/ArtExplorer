@@ -91,7 +91,7 @@ fun ArtworkCard(art: Artwork, onClick: () -> Unit) {
     ) {
         Column {
             AsyncImage(
-                model = art.imageUrl(400),
+                model = art.imageUrl(300),
                 contentDescription = art.title,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth().height(180.dp)
