@@ -1,7 +1,5 @@
 package com.example.artexplorer
 
-
-
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -31,7 +29,7 @@ fun ArtApp() {
 
     Scaffold(
         bottomBar = {
-            if (current != Screen.Detail.route  && current != Screen.ArtistWorks.route) {
+            if (current != Screen.Detail.route && current != Screen.ArtistWorks.route) {
                 NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                     tabs.forEach { (route, label, icon) ->
                         NavigationBarItem(
@@ -59,11 +57,20 @@ fun ArtApp() {
             composable(Screen.Gallery.route) {
                 GalleryScreen(onArtworkClick = { nav.navigate(Screen.Detail.create(it)) })
             }
+
+            composable(
+                route = Screen.Detail.route,
+                arguments = listOf(navArgument("id") { type = NavType.IntType })
+            ) {
+                DetailScreen(onBack = { nav.popBackStack() })
+            }
+
             composable(Screen.Artists.route) {
                 ArtistsScreen(onArtistClick = { id, name ->
                     nav.navigate(Screen.ArtistWorks.create(id, name))
                 })
             }
+
             composable(
                 route = Screen.ArtistWorks.route,
                 arguments = listOf(
@@ -75,6 +82,10 @@ fun ArtApp() {
                     onBack = { nav.popBackStack() },
                     onArtworkClick = { nav.navigate(Screen.Detail.create(it)) }
                 )
+            }
+
+            composable(Screen.Surprise.route) {
+                SurpriseScreen(onArtworkClick = { nav.navigate(Screen.Detail.create(it)) })
             }
         }
     }
