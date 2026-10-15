@@ -37,6 +37,18 @@ object ArtApi {
             parameter("fields", LIST_FIELDS)
         }.body()
 
+    suspend fun getArtworksByType(type: String, page: Int = 1, limit: Int = 20): ArtworksResponse {
+        val res = client.get("$BASE/artworks/search") {
+            parameter("query[match_phrase][artwork_type_title]", type)
+            parameter("page", page)
+            parameter("limit", limit)
+            parameter("fields", LIST_FIELDS)
+        }.body<ArtworksResponse>()
+
+        // Secours : si le filtre ne renvoie rien, recherche texte avec le nom de la catégorie
+        return if (res.data.isEmpty() && page == 1) searchArtworks(type, page, limit) else res
+    }
+
     suspend fun getArtworksByArtist(artistId: Int, page: Int = 1, limit: Int = 40): ArtworksResponse =
         client.get("$BASE/artworks/search") {
             parameter("query[term][artist_id]", artistId)

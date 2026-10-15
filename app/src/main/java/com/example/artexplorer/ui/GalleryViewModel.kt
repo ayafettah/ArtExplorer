@@ -23,6 +23,9 @@ class GalleryViewModel : ViewModel() {
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
+    private val _category = MutableStateFlow<String?>(null)
+    val category = _category.asStateFlow()
+
     private val _state = MutableStateFlow(GalleryState())
     val state = _state.asStateFlow()
 
@@ -30,13 +33,26 @@ class GalleryViewModel : ViewModel() {
     private var loadJob: Job? = null
 
     init {
-        reload()
         viewModelScope.launch {
-            _query.drop(1).debounce(400).distinctUntilChanged().collect { reload() }
+            combine(
+                _query.debounce { if (it.isEmpty()) 0L else 400L },
+                _category
+            ) { q, c -> q to c }
+                .distinctUntilChanged()
+                .collect { reload() }
         }
     }
 
-    fun onQueryChange(value: String) { _query.value = value }
+    // Recherche texte et catégorie sont exclusives : l'une remplace l'autre
+    fun onQueryChange(value: String) {
+        if (value.isNotBlank() && _category.value != null) _category.value = null
+        _query.value = value
+    }
+
+    fun onCategoryChange(value: String?) {
+        _query.value = ""
+        _category.value = value
+    }
 
     fun retry() = reload()
 
@@ -56,9 +72,13 @@ class GalleryViewModel : ViewModel() {
 
     private suspend fun fetch() {
         val q = _query.value.trim()
+        val cat = _category.value
         try {
-            val res = if (q.isBlank()) ArtApi.getArtworks(page)
-            else ArtApi.searchArtworks(q, page)
+            val res = when {
+                cat != null -> ArtApi.getArtworksByType(cat, page)
+                q.isBlank() -> ArtApi.getArtworks(page)
+                else -> ArtApi.searchArtworks(q, page)
+            }
             val newItems = res.data.filter { it.imageId != null }
             page++
             _state.value = _state.value.copy(
