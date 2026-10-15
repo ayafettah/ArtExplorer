@@ -1,15 +1,15 @@
 package com.example.artexplorer.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -21,6 +21,7 @@ import com.example.artexplorer.ui.theme.Gold
 @Composable
 fun DetailScreen(vm: DetailViewModel = viewModel(), onBack: () -> Unit) {
     val state by vm.state.collectAsState()
+    var showZoom by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize()) {
         IconButton(onClick = onBack) {
@@ -36,7 +37,13 @@ fun DetailScreen(vm: DetailViewModel = viewModel(), onBack: () -> Unit) {
                         model = art.imageUrl(843),
                         contentDescription = art.title,
                         contentScale = ContentScale.Fit,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().clickable { showZoom = true }
+                    )
+                    Text(
+                        "Touchez le tableau pour zoomer",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                     )
                     Column(Modifier.padding(16.dp)) {
                         Text(
@@ -56,6 +63,9 @@ fun DetailScreen(vm: DetailViewModel = viewModel(), onBack: () -> Unit) {
                         InfoRow("Origine", art.placeOfOrigin)
                         InfoRow("Description", art.description?.stripHtml())
                     }
+                }
+                if (showZoom) {
+                    art.imageUrl(1686)?.let { ZoomableImageDialog(it) { showZoom = false } }
                 }
             }
         }
