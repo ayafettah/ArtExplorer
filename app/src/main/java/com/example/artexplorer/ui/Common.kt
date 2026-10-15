@@ -17,7 +17,11 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.artexplorer.data.Artwork
 import com.example.artexplorer.ui.theme.Gold
-
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.graphicsLayer
 
 sealed interface UiState<out T> {
     object Loading : UiState<Nothing>
@@ -86,7 +90,7 @@ fun ScreenTitle(text: String) {
 @Composable
 fun ArtworkCard(art: Artwork, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        Modifier.fillMaxWidth().fadeInOnAppear().clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
@@ -114,5 +118,16 @@ fun ArtworkCard(art: Artwork, onClick: () -> Unit) {
                 )
             }
         }
+    }
+}
+@Composable
+fun Modifier.fadeInOnAppear(): Modifier {
+    val progress = remember { Animatable(0f) }
+    LaunchedEffect(Unit) { progress.animateTo(1f, tween(500)) }
+    return this.graphicsLayer {
+        alpha = progress.value
+        val s = 0.92f + 0.08f * progress.value
+        scaleX = s
+        scaleY = s
     }
 }

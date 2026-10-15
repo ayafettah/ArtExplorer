@@ -14,6 +14,9 @@ import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.example.artexplorer.navigation.Screen
 import com.example.artexplorer.ui.*
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 
 @Composable
 fun ArtApp() {
@@ -50,9 +53,14 @@ fun ArtApp() {
         }
     ) { padding ->
         NavHost(
+
             navController = nav,
             startDestination = Screen.Gallery.route,
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(padding),
+            enterTransition = { fadeIn(tween(350)) },
+            exitTransition = { fadeOut(tween(250)) },
+            popEnterTransition = { fadeIn(tween(350)) },
+            popExitTransition = { fadeOut(tween(250)) }
         ) {
             composable(Screen.Gallery.route) {
                 GalleryScreen(onArtworkClick = { nav.navigate(Screen.Detail.create(it)) })
