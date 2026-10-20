@@ -9,6 +9,7 @@ import io.ktor.client.request.parameter
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
+
 object ArtApi {
     private const val BASE = "https://api.artic.edu/api/v1"
     private const val LIST_FIELDS = "id,title,artist_display,date_display,image_id"
@@ -45,7 +46,6 @@ object ArtApi {
             parameter("fields", LIST_FIELDS)
         }.body<ArtworksResponse>()
 
-        // Secours : si le filtre ne renvoie rien, recherche texte avec le nom de la catégorie
         return if (res.data.isEmpty() && page == 1) searchArtworks(type, page, limit) else res
     }
 

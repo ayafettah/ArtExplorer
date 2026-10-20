@@ -1,20 +1,26 @@
 package com.example.artexplorer.ui
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.artexplorer.data.ArtApi
 import com.example.artexplorer.data.Artwork
+import com.example.artexplorer.data.local.AppDatabase
+import com.example.artexplorer.data.local.FavoriteArtwork
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class DetailViewModel(handle: SavedStateHandle) : ViewModel() {
+class DetailViewModel(app: Application, handle: SavedStateHandle) : AndroidViewModel(app) {
     private val id: Int = checkNotNull(handle["id"])
+    private val dao = AppDatabase.get(app).favoriteDao()
 
     private val _state = MutableStateFlow<UiState<Artwork>>(UiState.Loading)
     val state = _state.asStateFlow()
+
+    val isFavorite: StateFlow<Boolean> = dao.isFavorite(id)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     init { load() }
 
@@ -27,6 +33,23 @@ class DetailViewModel(handle: SavedStateHandle) : ViewModel() {
                 throw e
             } catch (e: Exception) {
                 UiState.Error("Impossible de charger l'œuvre")
+            }
+        }
+    }
+
+    fun toggleFavorite(art: Artwork) {
+        viewModelScope.launch {
+            if (isFavorite.value) {
+                dao.delete(art.id)
+            } else {
+                dao.insert(
+                    FavoriteArtwork(
+                        id = art.id,
+                        title = art.title,
+                        artist = art.artistDisplay?.lines()?.firstOrNull(),
+                        imageId = art.imageId
+                    )
+                )
             }
         }
     }

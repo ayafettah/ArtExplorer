@@ -17,6 +17,7 @@ import com.example.artexplorer.ui.*
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.material.icons.filled.Favorite
 
 @Composable
 fun ArtApp() {
@@ -27,7 +28,8 @@ fun ArtApp() {
     val tabs = listOf(
         Triple(Screen.Gallery.route, "Galerie", Icons.Default.GridView),
         Triple(Screen.Artists.route, "Artistes", Icons.Default.Brush),
-        Triple(Screen.Surprise.route, "Surprise", Icons.Default.AutoAwesome)
+        Triple(Screen.Surprise.route, "Surprise", Icons.Default.AutoAwesome),
+        Triple(Screen.Favorites.route, "Favoris", Icons.Default.Favorite)
     )
 
     Scaffold(
@@ -72,7 +74,9 @@ fun ArtApp() {
             ) {
                 DetailScreen(onBack = { nav.popBackStack() })
             }
-
+            composable(Screen.Favorites.route) {
+                FavoritesScreen(onArtworkClick = { nav.navigate(Screen.Detail.create(it)) })
+            }
             composable(Screen.Artists.route) {
                 ArtistsScreen(onArtistClick = { id, name ->
                     nav.navigate(Screen.ArtistWorks.create(id, name))

@@ -6,8 +6,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -21,12 +24,28 @@ import com.example.artexplorer.ui.theme.Gold
 @Composable
 fun DetailScreen(vm: DetailViewModel = viewModel(), onBack: () -> Unit) {
     val state by vm.state.collectAsState()
+    val isFavorite by vm.isFavorite.collectAsState()
     var showZoom by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize()) {
-        IconButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
+            }
+            Spacer(Modifier.weight(1f))
+            val current = state
+            if (current is UiState.Success) {
+                IconButton(onClick = { vm.toggleFavorite(current.data) }) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Default.Favorite
+                        else Icons.Default.FavoriteBorder,
+                        contentDescription = "Favori",
+                        tint = if (isFavorite) Color(0xFFE53935) else LocalContentColor.current
+                    )
+                }
+            }
         }
+
         when (val s = state) {
             UiState.Loading -> LoadingView()
             is UiState.Error -> ErrorView(s.message, vm::load)

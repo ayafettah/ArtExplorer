@@ -2,6 +2,8 @@ package com.example.artexplorer.navigation
 
 import android.net.Uri
 sealed class Screen(val route: String) {
+
+    object Favorites : Screen("favorites")
     object Gallery : Screen("gallery")
 
     object ArtistWorks : Screen("artist/{id}/{name}") {
