@@ -1,6 +1,4 @@
 package com.example.artexplorer.ui
-
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,7 +23,7 @@ import com.example.artexplorer.ui.theme.Gold
 fun DetailScreen(vm: DetailViewModel = viewModel(), onBack: () -> Unit) {
     val state by vm.state.collectAsState()
     val isFavorite by vm.isFavorite.collectAsState()
-    var showZoom by remember { mutableStateOf(false) }
+
 
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -56,7 +54,7 @@ fun DetailScreen(vm: DetailViewModel = viewModel(), onBack: () -> Unit) {
                         model = art.imageUrl(843),
                         contentDescription = art.title,
                         contentScale = ContentScale.Fit,
-                        modifier = Modifier.fillMaxWidth().clickable { showZoom = true }
+
                     )
                     Text(
                         "Touchez le tableau pour zoomer",
@@ -83,9 +81,7 @@ fun DetailScreen(vm: DetailViewModel = viewModel(), onBack: () -> Unit) {
                         InfoRow("Description", art.description?.stripHtml())
                     }
                 }
-                if (showZoom) {
-                    art.imageUrl(1686)?.let { ZoomableImageDialog(it) { showZoom = false } }
-                }
+
             }
         }
     }

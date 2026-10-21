@@ -51,6 +51,5 @@ data class ArtistsResponse(
     val data: List<Artist> = emptyList()
 )
 
-// La description de l'API contient du HTML : on le nettoie
 fun String.stripHtml(): String =
     replace(Regex("<[^>]*>"), "").replace("&nbsp;", " ").replace("&amp;", "&").trim()

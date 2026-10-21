@@ -31,9 +31,10 @@ class DetailViewModel(app: Application, handle: SavedStateHandle) : AndroidViewM
                 UiState.Success(ArtApi.getArtwork(id))
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: Exception) {
-                UiState.Error("Impossible de charger l'œuvre")
-            }
+            }  catch (e: Exception) {
+            android.util.Log.e("Detail", "Erreur chargement œuvre id=$id", e)
+            UiState.Error("Impossible de charger l'œuvre")
+        }
         }
     }
 

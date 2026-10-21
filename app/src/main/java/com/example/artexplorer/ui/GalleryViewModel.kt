@@ -92,6 +92,14 @@ class GalleryViewModel : ViewModel() {
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            if (e is CancellationException) throw e
+
+            android.util.Log.e(
+                "GalleryViewModel",
+                "Erreur lors du chargement des œuvres",
+                e
+            )
+
             val empty = _state.value.items.isEmpty()
             _state.value = _state.value.copy(
                 loading = false,

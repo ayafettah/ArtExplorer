@@ -28,7 +28,6 @@ fun ArtApp() {
     val tabs = listOf(
         Triple(Screen.Gallery.route, "Galerie", Icons.Default.GridView),
         Triple(Screen.Artists.route, "Artistes", Icons.Default.Brush),
-        Triple(Screen.Surprise.route, "Surprise", Icons.Default.AutoAwesome),
         Triple(Screen.Favorites.route, "Favoris", Icons.Default.Favorite)
     )
 
@@ -96,9 +95,6 @@ fun ArtApp() {
                 )
             }
 
-            composable(Screen.Surprise.route) {
-                SurpriseScreen(onArtworkClick = { nav.navigate(Screen.Detail.create(it)) })
-            }
         }
     }
 }

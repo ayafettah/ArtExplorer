@@ -10,7 +10,7 @@ sealed class Screen(val route: String) {
         fun create(id: Int, name: String) = "artist/$id/${Uri.encode(name)}"
     }
     object Artists : Screen("artists")
-    object Surprise : Screen("surprise")
+
     object Detail : Screen("detail/{id}") {
         fun create(id: Int) = "detail/$id"
     }

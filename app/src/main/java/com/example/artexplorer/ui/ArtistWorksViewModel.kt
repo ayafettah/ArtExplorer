@@ -21,12 +21,23 @@ class ArtistWorksViewModel(handle: SavedStateHandle) : ViewModel() {
 
     init { load() }
 
+
     fun load() {
         viewModelScope.launch {
             _state.value = UiState.Loading
             _state.value = try {
-                var res = ArtApi.getArtworksByArtist(id)
-                if (res.data.none { it.imageId != null }) res = ArtApi.searchArtworks(name)
+                // 1) par identifiant d'artiste (null si le serveur échoue)
+                val byId = try {
+                    ArtApi.getArtworksByArtist(id)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    null
+                }
+                // 2) sinon recherche par nom de l'artiste
+                val res = if (byId != null && byId.data.any { it.imageId != null }) byId
+                else ArtApi.searchArtworks(name)
+
                 UiState.Success(res.data.filter { it.imageId != null })
             } catch (e: CancellationException) {
                 throw e
